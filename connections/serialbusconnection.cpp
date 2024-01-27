@@ -43,7 +43,11 @@ void SerialBusConnection::piStarted()
     connect(mDev_p, &QCanBusDevice::framesReceived, this, &SerialBusConnection::framesReceived);
 
     connect(&mTimer, SIGNAL(timeout()), this, SLOT(testConnection()));
+    QString name = getPort();
     mTimer.setInterval(1000);
+    //second iface needs to be configured after first iface
+    if ((name.indexOf("gs_usb") != -1) && (name.indexOf(".1") != -1))
+        mTimer.setInterval(1100);
     mTimer.setSingleShot(false); //keep ticking
     mTimer.start();
     mBusData[0].mBus.setActive(true);

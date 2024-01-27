@@ -3011,7 +3011,8 @@ bool FrameFileIO::saveCanDumpFile(QString filename, const QVector<CANFrame> * fr
 
         tempTime = frame->timeStamp().microSeconds() / 1000000.0;
         outFile->write(QString::number(tempTime,'f', 6).rightJustified(17, '0').toUtf8());
-        outFile->write(") vcan0 ");
+        QString iface = ") vcan" + QString::number(frame->bus) + " ";
+        outFile->write(iface.toUtf8());
 
         if (frame->hasExtendedFrameFormat()) {
             outFile->write(QString::number(frame->frameId(), 16).rightJustified(8,'0').toUpper().toUtf8());

@@ -150,6 +150,7 @@ void CANConnection::setBusSettings(int pBusIdx, CANBus pBus)
                                   Q_ARG(CANBus, pBus));
         return;
     }
+    mBusData[0].mBus.setSpeed(pBus.speed);
 
     return piSetBusSettings(pBusIdx, pBus);
 }
@@ -241,6 +242,10 @@ LFQueue<CANFrame>& CANConnection::getQueue() {
 
 CANCon::type CANConnection::getType() {
     return mType;
+}
+
+int CANConnection::getBusSpeed() {
+    return mBusData[0].mBus.getSpeed();
 }
 
 

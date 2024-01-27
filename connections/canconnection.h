@@ -58,6 +58,8 @@ public:
      */
     QString getDriver();
 
+    int getBusSpeed();
+
 
     /**
      * @brief getQueue

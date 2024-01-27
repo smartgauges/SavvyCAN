@@ -32,7 +32,7 @@ MainSettingsDialog::MainSettingsDialog(QWidget *parent) :
     ui->lineRemoteHost->setText(settings.value("Remote/Host", "api.savvycan.com").toString());
     ui->lineRemotePort->setText(settings.value("Remote/Port", "21315").toString()); // = 0x5343 = SC. Yep, really creative port number
     ui->cbAutoStartRemote->setChecked(settings.value("Remote/AutoStart", false).toBool());
-    ui->cbLoadConnections->setChecked(settings.value("Main/SaveRestoreConnections", false).toBool());
+    ui->cbLoadConnections->setChecked(settings.value("Main/SaveRestoreConnections", true).toBool());
 
     ui->spinFontSize->setValue(settings.value("Main/FontSize", ui->cbDisplayHex->font().pointSize()).toUInt());
 

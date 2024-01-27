@@ -9,6 +9,7 @@ QT = core gui printsupport qml serialbus serialport widgets help
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 CONFIG += c++11
+CONFIG += static
 
 DEFINES += QCUSTOMPLOT_USE_OPENGL
 
@@ -174,7 +175,9 @@ RESOURCES += \
     images.qrc
 
 win32 {
-   LIBS += opengl32.lib
+   #LIBS += opengl32.lib
+   include(qtcanbus/gs/gs.pri)
+   QMAKE_LFLAGS += -static -static-libgcc
 }
 
 unix {

@@ -43,7 +43,7 @@ ConnectionWindow::ConnectionWindow(QWidget *parent) :
     ui->btnSendText->setEnabled(false);
     ui->lineSend->setEnabled(false);
 
-    if (settings.value("Main/SaveRestoreConnections", false).toBool())
+    if (settings.value("Main/SaveRestoreConnections", true).toBool())
     {
         /* load connection configuration */
         loadConnections();
@@ -245,6 +245,8 @@ void ConnectionWindow::handleResetConn()
     type = conn_p->getType();
     port = conn_p->getPort();
     driver = conn_p->getDriver();
+    CANBus bus;
+    conn_p->getBusSettings(0, bus);
 
     /* stop and delete connection */
     conn_p->stop();
@@ -252,6 +254,8 @@ void ConnectionWindow::handleResetConn()
     conn_p = nullptr;
 
     conn_p = create(type, port, driver);
+    conn_p->setBusSettings(0, bus);
+
     if (conn_p) connModel->replace(selIdx, conn_p);
 }
 
@@ -443,15 +447,23 @@ void ConnectionWindow::loadConnections()
     QVector<QString> portNames = settings.value("connections/portNames").value<QVector<QString>>();
     QVector<QString> driverNames = settings.value("connections/driverNames").value<QVector<QString>>();
     QVector<int>    devTypes = settings.value("connections/types").value<QVector<int>>();
+    QVector<int>    busSpeeds = settings.value("connections/speeds").value<QVector<int>>();
 
     //don't load the connections if the three setting arrays above aren't all the same size.
-    if (portNames.count() != driverNames.count() || devTypes.count() != driverNames.count()) return;
+    if (portNames.count() != driverNames.count() || devTypes.count() != driverNames.count() || busSpeeds.count() != driverNames.count()) return;
 
     for(int i = 0 ; i < portNames.count() ; i++)
     {
         CANConnection* conn_p = create((CANCon::type)devTypes[i], portNames[i], driverNames[i]);
         /* add connection to model */
         connModel->add(conn_p);
+        CANBus bus;
+        if (conn_p->getBusSettings(0, bus))
+        {
+            bus.setSpeed(busSpeeds[i]);
+            bus.setActive(false);
+            conn_p->setBusSettings(0, bus);
+        }
     }
 
     if (connModel->rowCount() > 0) {
@@ -467,6 +479,8 @@ void ConnectionWindow::saveConnections()
     QVector<QString> portNames;
     QVector<int> devTypes;
     QVector<QString> driverNames;
+    QVector<int> busSpeeds;
+
 
     /* save connections */
     foreach(CANConnection* conn_p, conns)
@@ -474,9 +488,11 @@ void ConnectionWindow::saveConnections()
         portNames.append(conn_p->getPort());
         devTypes.append(conn_p->getType());
         driverNames.append(conn_p->getDriver());
+        busSpeeds.append(conn_p->getBusSpeed());
     }
 
     settings.setValue("connections/portNames", QVariant::fromValue(portNames));
     settings.setValue("connections/types", QVariant::fromValue(devTypes));
     settings.setValue("connections/driverNames", QVariant::fromValue(driverNames));
+    settings.setValue("connections/speeds", QVariant::fromValue(busSpeeds));
 }
